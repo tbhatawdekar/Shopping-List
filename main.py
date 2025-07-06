@@ -4,7 +4,23 @@ import models
 from database import Base, engine, SessionLocal
 from sqlalchemy.orm import Session
 
+from fastapi.middleware.cors import CORSMiddleware
+
+origins = [
+    "http://localhost:2500",
+    "https://shopping-list-fe.onrender.com/"
+]
+
+
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Your list of allowed origins
+    allow_credentials=True, # Set to True to allow credentials (cookies, authorization headers)
+    allow_methods=["*"],    # Allows all methods (or specify specific methods like ["GET", "POST"])
+    allow_headers=["*"],    # Allows all headers (or specify specific headers)
+)
 
 Base.metadata.create_all(engine)
 def get_session():
@@ -14,11 +30,11 @@ def get_session():
     finally:
         session.close()
 
-fakeDatabase = {
-    1: {"item": "shoes"},
-    2: {"item": "book"},
-    3: {"item": "makeup"}
-}
+# fakeDatabase = {
+#     1: {"item": "shoes"},
+#     2: {"item": "book"},
+#     3: {"item": "makeup"}
+# }
 
 @app.get("/")
 def getItems(session: Session = Depends(get_session)):
