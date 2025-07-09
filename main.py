@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 import schemas
 import models
 from database import Base, engine, SessionLocal
@@ -48,6 +48,8 @@ def getItem(id:int, session: Session = Depends(get_session)):
 
 @app.post("/")
 def addItem(item:schemas.Item, session = Depends(get_session)):
+    if not item.task.strip():
+        raise HTTPException(status_code=400, detail="Task cannot be empty")
     item = models.Item(task = item.task)
     session.add(item)
     session.commit()
@@ -56,6 +58,8 @@ def addItem(item:schemas.Item, session = Depends(get_session)):
 
 @app.put("/{id}")
 def updateItem(id:int, item:schemas.Item, session = Depends(get_session)):
+    if not item.task.strip():
+        raise HTTPException(status_code=400, detail="Task cannot be empty")
     itemObject = session.query(models.Item).get(id)
     itemObject.task = item.task
     session.commit()
@@ -69,4 +73,4 @@ def deleteItem(id:int, session = Depends(get_session)):
     session.close()
     return 'Item was deleted'
 
-
+#validate function
